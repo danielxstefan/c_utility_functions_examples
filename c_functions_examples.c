@@ -330,6 +330,226 @@ time(&t);
 localTime = localtime(&t);
 strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", localTime);
 ------------------------------------------------------------------------------------------------------------------------
+***** Bits manipulation ****
+------------------------------------------------------------------------------------------------------------------------
+int extractBitPosition(int HEXnumber, int littleEndianPosition) {
+    // Shift the HEXnumber right by 'littleEndianPosition' bits and 
+    // bitwise AND with 1 to isolate the bit at the specified position.
+    return (HEXnumber >> littleEndianPosition) & 1;
+}
+int main() {
+    int number = 0xA; // 0xA is 1010 in binary
+    int position = 3; // Bit position to extract
+    int bit = extractBitPosition(number, position);
+    printf("The bit at position %d is: %d\n", position, bit);
+    return 0;
+}
+------------------------------------------------------------------------------------------------------------------------
+Set a bit at a specific position (bitwise OR):
+unsigned int num = 5; // Binary: 0000 0101
+unsigned int mask = 1 << 2; // Set bit 2 (zero-based) to 1
+num |= mask; // Result: 0000 1101 (13 in decimal)
+------------------------------------------------------------------------------------------------------------------------
+Clear a bit at a specific position (bitwise AND with complement):
+unsigned int num = 13; // Binary: 0000 1101
+unsigned int mask = ~(1 << 3); // Clear bit 3 (zero-based)
+num &= mask; // Result: 0000 0101 (5 in decimal)
+------------------------------------------------------------------------------------------------------------------------
+Toggle a bit at a specific position (bitwise XOR):
+unsigned int num = 5; // Binary: 0000 0101
+unsigned int mask = 1 << 1; // Toggle bit 1 (zero-based)
+num ^= mask; // Result: 0000 0111 (7 in decimal)
+------------------------------------------------------------------------------------------------------------------------
+Check if a specific bit is set:
+unsigned int num = 13; // Binary: 0000 1101
+unsigned int mask = 1 << 2; // Check bit 2 (zero-based)
+if (num & mask) {
+    // Bit is set
+}
+------------------------------------------------------------------------------------------------------------------------
+Check if a specific bit is clear:
+unsigned int num = 5; // Binary: 0000 0101
+unsigned int mask = 1 << 1; // Check bit 1 (zero-based)
+if (!(num & mask)) {
+    // Bit is clear
+}
+------------------------------------------------------------------------------------------------------------------------
+Set multiple bits at once:
+unsigned int num = 0; // All bits initially clear
+unsigned int mask = (1 << 3) | (1 << 5); // Set bits 3 and 5 (zero-based)
+num |= mask; // Result: 0010 0100 (36 in decimal)
+------------------------------------------------------------------------------------------------------------------------
+Clear multiple bits at once:
+unsigned int num = 36; // Binary: 0010 0100
+unsigned int mask = ~(1 << 2) & ~(1 << 5); // Clear bits 2 and 5 (zero-based)
+num &= mask; // Result: 0000 0100 (4 in decimal)
+------------------------------------------------------------------------------------------------------------------------
+Toggle multiple bits at once:
+unsigned int num = 4; // Binary: 0000 0100
+unsigned int mask = (1 << 1) | (1 << 3); // Toggle bits 1 and 3 (zero-based)
+num ^= mask; // Result: 0000 0001 (1 in decimal)
+------------------------------------------------------------------------------------------------------------------------
+Get the value of a specific bit:
+unsigned int num = 9; // Binary: 0000 1001
+unsigned int bitValue = (num >> 3) & 1; // Get the value of bit 3 (zero-based)
+------------------------------------------------------------------------------------------------------------------------
+Set a bit to 1 without changing the other bits:
+unsigned int num = 12; // Binary: 0000 1100
+unsigned int bitPosition = 2; // Set bit 2 (zero-based) to 1
+num |= (1 << bitPosition); // Result: 0000 1100 (12 in decimal)
+------------------------------------------------------------------------------------------------------------------------
+Clear a bit to 0 without changing the other bits:
+unsigned int num = 12; // Binary: 0000 1100
+unsigned int bitPosition = 3; // Clear bit 3 (zero-based)
+num &= ~(1 << bitPosition); // Result: 0000 0100 (4 in decimal)
+------------------------------------------------------------------------------------------------------------------------
+Swap two variables using XOR (no temporary variable needed):
+int a = 5;
+int b = 7;
+a ^= b;
+b ^= a;
+a ^= b;
+// Now a=7 and b=5
+Count the number of set bits (1s) in an integer (population count or Hamming weight):
+unsigned int num = 13; // Binary: 0000 1101
+int count = 0;
+while (num) {
+    count += num & 1;
+    num >>= 1;
+}
+------------------------------------------------------------------------------------------------------------------------
+// count will be 3
+Find the least significant set bit (rightmost set bit):
+unsigned int num = 28; // Binary: 0001 1100
+int position = 0;
+while (!(num & (1 << position))) {
+    position++;
+}
+// position will be 2
+------------------------------------------------------------------------------------------------------------------------
+Check if an integer is a power of 2:
+int num = 16;
+if (num && !(num & (num - 1))) {
+    // num is a power of 2
+}
+------------------------------------------------------------------------------------------------------------------------
+Extract a specific field of bits from an integer:
+unsigned int num = 0x3A5; // Binary: 0011 1010 0101
+unsigned int mask = 0x1F; // Extract 5 bits (low-order bits)
+unsigned int result = num & mask; // Result: 0101 (5 in decimal)
+------------------------------------------------------------------------------------------------------------------------
+Set all bits in a range to 1:
+unsigned int num = 0x3A5; // Binary: 0011 1010 0101
+unsigned int startBit = 2;
+unsigned int endBit = 6;
+unsigned int mask = ((1 << (endBit - startBit + 1)) - 1) << startBit;
+num |= mask; // Result: 0011 1111 1101 (509 in decimal)
+------------------------------------------------------------------------------------------------------------------------
+Clear all bits in a range to 0:
+unsigned int num = 0x3A5; // Binary: 0011 1010 0101
+unsigned int startBit = 2;
+unsigned int endBit = 6;
+unsigned int mask = (((1 << (endBit - startBit + 1)) - 1) << startBit) ^ UINT_MAX;
+num &= mask; // Result: 0000 0010 0001 (33 in decimal)
+------------------------------------------------------------------------------------------------------------------------
+Rotate bits left:
+unsigned int num = 0x0A5; // Binary: 0000 1010 0101
+unsigned int shift = 3;
+unsigned int rotated = (num << shift) | (num >> (sizeof(num) * 8 - shift));
+// Result: 1010 0101 0000 (26944 in decimal)
+------------------------------------------------------------------------------------------------------------------------
+Rotate bits right:
+unsigned int num = 0x0A5; // Binary: 0000 1010 0101
+unsigned int shift = 3;
+unsigned int rotated = (num >> shift) | (num << (sizeof(num) * 8 - shift));
+// Result: 1010 1001 0000 (16896 in decimal)
+------------------------------------------------------------------------------------------------------------------------
+Swap adjacent pairs of bits:
+unsigned int num = 0x0A5; // Binary: 0000 1010 0101
+unsigned int swapped = ((num & 0xAAAAAAAA) >> 1) | ((num & 0x55555555) << 1);
+// Result: 0101 0100 1010 (1482 in decimal)
+------------------------------------------------------------------------------------------------------------------------
+Reverse bits in an integer:
+unsigned int num = 0x0A5; // Binary: 0000 1010 0101
+unsigned int reversed = 0;
+int numBits = sizeof(num) * 8;
+for (int i = 0; i < numBits; i++) {
+    reversed |= ((num >> i) & 1) << (numBits - 1 - i);
+}
+// Result: 1010 0101 0000 (16896 in decimal)
+------------------------------------------------------------------------------------------------------------------------
+Count trailing zeros (rightmost zeros) in an integer:
+unsigned int num = 0x0A5000; // Binary: 0000 1010 0101 0000 0000
+int count = 0;
+while ((num & 1) == 0) {
+    count++;
+    num >>= 1;
+}
+// count will be 5
+------------------------------------------------------------------------------------------------------------------------
+Count leading zeros (leftmost zeros) in an integer:
+unsigned int num = 0x0A5000; // Binary: 0000 1010 0101 0000 0000
+int count = 0;
+int numBits = sizeof(num) * 8;
+while (numBits > 0 && (num & (1 << (numBits - 1))) == 0) {
+    count++;
+    numBits--;
+}
+// count will be 11
+------------------------------------------------------------------------------------------------------------------------
+Swap the value of two bits in an integer:
+unsigned int num = 0x0A5; // Binary: 0000 1010 0101
+int bit1 = 2;
+int bit2 = 5;
+unsigned int bit1Value = (num >> bit1) & 1;
+unsigned int bit2Value = (num >> bit2) & 1;
+num = (num & ~(1 << bit1)) | (bit2Value << bit1);
+num = (num & ~(1 << bit2)) | (bit1Value << bit2);
+// Result: 0010 0101 (37 in decimal)
+------------------------------------------------------------------------------------------------------------------------
+Get the highest set bit (most significant set bit):
+unsigned int num = 0x3A5; // Binary: 0011 1010 0101
+int position = 0;
+int numBits = sizeof(num) * 8;
+while (numBits > 0) {
+    if (num & (1 << (numBits - 1))) {
+        position = numBits - 1;
+        break;
+    }
+    numBits--;
+}
+// position will be 9
+------------------------------------------------------------------------------------------------------------------------
+Extract and isolate the lowest set bit:
+unsigned int num = 0x3A5; // Binary: 0011 1010 0101
+unsigned int lowestBit = num & -num; // Extract and isolate the lowest set bit
+// lowestBit will be 0x01 (1 in decimal)
+------------------------------------------------------------------------------------------------------------------------
+Set all bits to the right of the lowest set bit to 1:
+unsigned int num = 0x3A5; // Binary: 0011 1010 0101
+unsigned int lowestBit = num & -num; // Extract and isolate the lowest set bit
+unsigned int result = num | (lowestBit - 1);
+// Result: 0011 1010 0111 (951 in decimal)
+------------------------------------------------------------------------------------------------------------------------
+Reverse bits within bytes, but not across bytes:
+unsigned int num = 0x0A5C3B10; // Binary: 0000 1010 0101 1100 0011 1011 0001 0000
+unsigned int reversed = 0;
+unsigned int mask = 0xFF;
+for (int i = 0; i < sizeof(num); i++) {
+    reversed = (reversed << 8) | ((num >> (i * 8)) & mask);
+}
+// Result: 0000 0001 0001 1011 0011 1101 0100 0100 (17743876 in decimal)
+------------------------------------------------------------------------------------------------------------------------
+Find the position (index) of the only set bit in a power of 2:
+unsigned int num = 16; // Binary: 0001 0000
+int position = 0;
+if (num && !(num & (num - 1))) {
+    while (num >>= 1) {
+        position++;
+    }
+}
+// position will be 4
+------------------------------------------------------------------------------------------------------------------------    
 open - Open a file or create it
 Example::
 int fd = open("myfile.txt", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
@@ -547,211 +767,6 @@ Example::::c sem_post(&semaphore);
 ------------------------------------------------------------------------------------------------------------------------
 sem_destroy - Destroy a semaphore
 Example::::c sem_destroy(&semaphore);
-------------------------------------------------------------------------------------------------------------------------
-Set a bit at a specific position (bitwise OR):
-unsigned int num = 5; // Binary: 0000 0101
-unsigned int mask = 1 << 2; // Set bit 2 (zero-based) to 1
-num |= mask; // Result: 0000 1101 (13 in decimal)
-------------------------------------------------------------------------------------------------------------------------
-Clear a bit at a specific position (bitwise AND with complement):
-unsigned int num = 13; // Binary: 0000 1101
-unsigned int mask = ~(1 << 3); // Clear bit 3 (zero-based)
-num &= mask; // Result: 0000 0101 (5 in decimal)
-------------------------------------------------------------------------------------------------------------------------
-Toggle a bit at a specific position (bitwise XOR):
-unsigned int num = 5; // Binary: 0000 0101
-unsigned int mask = 1 << 1; // Toggle bit 1 (zero-based)
-num ^= mask; // Result: 0000 0111 (7 in decimal)
-------------------------------------------------------------------------------------------------------------------------
-Check if a specific bit is set:
-unsigned int num = 13; // Binary: 0000 1101
-unsigned int mask = 1 << 2; // Check bit 2 (zero-based)
-if (num & mask) {
-    // Bit is set
-}
-------------------------------------------------------------------------------------------------------------------------
-Check if a specific bit is clear:
-unsigned int num = 5; // Binary: 0000 0101
-unsigned int mask = 1 << 1; // Check bit 1 (zero-based)
-if (!(num & mask)) {
-    // Bit is clear
-}
-------------------------------------------------------------------------------------------------------------------------
-Set multiple bits at once:
-unsigned int num = 0; // All bits initially clear
-unsigned int mask = (1 << 3) | (1 << 5); // Set bits 3 and 5 (zero-based)
-num |= mask; // Result: 0010 0100 (36 in decimal)
-------------------------------------------------------------------------------------------------------------------------
-Clear multiple bits at once:
-unsigned int num = 36; // Binary: 0010 0100
-unsigned int mask = ~(1 << 2) & ~(1 << 5); // Clear bits 2 and 5 (zero-based)
-num &= mask; // Result: 0000 0100 (4 in decimal)
-------------------------------------------------------------------------------------------------------------------------
-Toggle multiple bits at once:
-unsigned int num = 4; // Binary: 0000 0100
-unsigned int mask = (1 << 1) | (1 << 3); // Toggle bits 1 and 3 (zero-based)
-num ^= mask; // Result: 0000 0001 (1 in decimal)
-------------------------------------------------------------------------------------------------------------------------
-Get the value of a specific bit:
-unsigned int num = 9; // Binary: 0000 1001
-unsigned int bitValue = (num >> 3) & 1; // Get the value of bit 3 (zero-based)
-------------------------------------------------------------------------------------------------------------------------
-Set a bit to 1 without changing the other bits:
-unsigned int num = 12; // Binary: 0000 1100
-unsigned int bitPosition = 2; // Set bit 2 (zero-based) to 1
-num |= (1 << bitPosition); // Result: 0000 1100 (12 in decimal)
-------------------------------------------------------------------------------------------------------------------------
-Clear a bit to 0 without changing the other bits:
-unsigned int num = 12; // Binary: 0000 1100
-unsigned int bitPosition = 3; // Clear bit 3 (zero-based)
-num &= ~(1 << bitPosition); // Result: 0000 0100 (4 in decimal)
-------------------------------------------------------------------------------------------------------------------------
-Swap two variables using XOR (no temporary variable needed):
-int a = 5;
-int b = 7;
-a ^= b;
-b ^= a;
-a ^= b;
-// Now a=7 and b=5
-Count the number of set bits (1s) in an integer (population count or Hamming weight):
-unsigned int num = 13; // Binary: 0000 1101
-int count = 0;
-while (num) {
-    count += num & 1;
-    num >>= 1;
-}
-------------------------------------------------------------------------------------------------------------------------
-// count will be 3
-Find the least significant set bit (rightmost set bit):
-unsigned int num = 28; // Binary: 0001 1100
-int position = 0;
-while (!(num & (1 << position))) {
-    position++;
-}
-// position will be 2
-------------------------------------------------------------------------------------------------------------------------
-Check if an integer is a power of 2:
-int num = 16;
-if (num && !(num & (num - 1))) {
-    // num is a power of 2
-}
-------------------------------------------------------------------------------------------------------------------------
-Extract a specific field of bits from an integer:
-unsigned int num = 0x3A5; // Binary: 0011 1010 0101
-unsigned int mask = 0x1F; // Extract 5 bits (low-order bits)
-unsigned int result = num & mask; // Result: 0101 (5 in decimal)
-------------------------------------------------------------------------------------------------------------------------
-Set all bits in a range to 1:
-unsigned int num = 0x3A5; // Binary: 0011 1010 0101
-unsigned int startBit = 2;
-unsigned int endBit = 6;
-unsigned int mask = ((1 << (endBit - startBit + 1)) - 1) << startBit;
-num |= mask; // Result: 0011 1111 1101 (509 in decimal)
-------------------------------------------------------------------------------------------------------------------------
-Clear all bits in a range to 0:
-unsigned int num = 0x3A5; // Binary: 0011 1010 0101
-unsigned int startBit = 2;
-unsigned int endBit = 6;
-unsigned int mask = (((1 << (endBit - startBit + 1)) - 1) << startBit) ^ UINT_MAX;
-num &= mask; // Result: 0000 0010 0001 (33 in decimal)
-------------------------------------------------------------------------------------------------------------------------
-Rotate bits left:
-unsigned int num = 0x0A5; // Binary: 0000 1010 0101
-unsigned int shift = 3;
-unsigned int rotated = (num << shift) | (num >> (sizeof(num) * 8 - shift));
-// Result: 1010 0101 0000 (26944 in decimal)
-------------------------------------------------------------------------------------------------------------------------
-Rotate bits right:
-unsigned int num = 0x0A5; // Binary: 0000 1010 0101
-unsigned int shift = 3;
-unsigned int rotated = (num >> shift) | (num << (sizeof(num) * 8 - shift));
-// Result: 1010 1001 0000 (16896 in decimal)
-------------------------------------------------------------------------------------------------------------------------
-Swap adjacent pairs of bits:
-unsigned int num = 0x0A5; // Binary: 0000 1010 0101
-unsigned int swapped = ((num & 0xAAAAAAAA) >> 1) | ((num & 0x55555555) << 1);
-// Result: 0101 0100 1010 (1482 in decimal)
-------------------------------------------------------------------------------------------------------------------------
-Reverse bits in an integer:
-unsigned int num = 0x0A5; // Binary: 0000 1010 0101
-unsigned int reversed = 0;
-int numBits = sizeof(num) * 8;
-for (int i = 0; i < numBits; i++) {
-    reversed |= ((num >> i) & 1) << (numBits - 1 - i);
-}
-// Result: 1010 0101 0000 (16896 in decimal)
-------------------------------------------------------------------------------------------------------------------------
-Count trailing zeros (rightmost zeros) in an integer:
-unsigned int num = 0x0A5000; // Binary: 0000 1010 0101 0000 0000
-int count = 0;
-while ((num & 1) == 0) {
-    count++;
-    num >>= 1;
-}
-// count will be 5
-------------------------------------------------------------------------------------------------------------------------
-Count leading zeros (leftmost zeros) in an integer:
-unsigned int num = 0x0A5000; // Binary: 0000 1010 0101 0000 0000
-int count = 0;
-int numBits = sizeof(num) * 8;
-while (numBits > 0 && (num & (1 << (numBits - 1))) == 0) {
-    count++;
-    numBits--;
-}
-// count will be 11
-------------------------------------------------------------------------------------------------------------------------
-Swap the value of two bits in an integer:
-unsigned int num = 0x0A5; // Binary: 0000 1010 0101
-int bit1 = 2;
-int bit2 = 5;
-unsigned int bit1Value = (num >> bit1) & 1;
-unsigned int bit2Value = (num >> bit2) & 1;
-num = (num & ~(1 << bit1)) | (bit2Value << bit1);
-num = (num & ~(1 << bit2)) | (bit1Value << bit2);
-// Result: 0010 0101 (37 in decimal)
-------------------------------------------------------------------------------------------------------------------------
-Get the highest set bit (most significant set bit):
-unsigned int num = 0x3A5; // Binary: 0011 1010 0101
-int position = 0;
-int numBits = sizeof(num) * 8;
-while (numBits > 0) {
-    if (num & (1 << (numBits - 1))) {
-        position = numBits - 1;
-        break;
-    }
-    numBits--;
-}
-// position will be 9
-------------------------------------------------------------------------------------------------------------------------
-Extract and isolate the lowest set bit:
-unsigned int num = 0x3A5; // Binary: 0011 1010 0101
-unsigned int lowestBit = num & -num; // Extract and isolate the lowest set bit
-// lowestBit will be 0x01 (1 in decimal)
-------------------------------------------------------------------------------------------------------------------------
-Set all bits to the right of the lowest set bit to 1:
-unsigned int num = 0x3A5; // Binary: 0011 1010 0101
-unsigned int lowestBit = num & -num; // Extract and isolate the lowest set bit
-unsigned int result = num | (lowestBit - 1);
-// Result: 0011 1010 0111 (951 in decimal)
-------------------------------------------------------------------------------------------------------------------------
-Reverse bits within bytes, but not across bytes:
-unsigned int num = 0x0A5C3B10; // Binary: 0000 1010 0101 1100 0011 1011 0001 0000
-unsigned int reversed = 0;
-unsigned int mask = 0xFF;
-for (int i = 0; i < sizeof(num); i++) {
-    reversed = (reversed << 8) | ((num >> (i * 8)) & mask);
-}
-// Result: 0000 0001 0001 1011 0011 1101 0100 0100 (17743876 in decimal)
-------------------------------------------------------------------------------------------------------------------------
-Find the position (index) of the only set bit in a power of 2:
-unsigned int num = 16; // Binary: 0001 0000
-int position = 0;
-if (num && !(num & (num - 1))) {
-    while (num >>= 1) {
-        position++;
-    }
-}
-// position will be 4
 ------------------------------------------------------------------------------------------------------------------------
 Declare a pointer to an integer variable:
 int x = 10;
